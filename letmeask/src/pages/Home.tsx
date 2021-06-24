@@ -21,7 +21,7 @@ export function Home() {
         }
         history.push('rooms/new')
     }
-
+// TODO react-hot-toast substittuir alertas
     async function handleJoinRoom(event:FormEvent) {
         event.preventDefault();
 
@@ -29,7 +29,9 @@ export function Home() {
 
         const roomRef = await database.ref(`rooms/${roomCode}`).get();
 
-        if(!roomRef.exists()) return alert('Room does not exists')
+        if(!roomRef.exists()) return alert('Essa sala não existe');
+
+        if(roomRef.val().endedAt) return alert('Esta sala já está fechada');
 
         history.push(`rooms/${roomCode}`)
 

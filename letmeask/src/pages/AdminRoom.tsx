@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import {  useState } from "react";
 import { useHistory, useParams } from "react-router-dom"
 import logoImg from '../assets/images/logo.svg';
 
@@ -21,11 +21,9 @@ type RoomParams = {
 
 export function AdminRoom() {
     const history = useHistory()
-    const  { user } = useAuth()
     const params = useParams<RoomParams>();
     const roomId = params.id;
     const {questions, title} = useRoom(roomId)
-    const [newQuestion, setNewQuestion] = useState('');
     
     
     async function handleEndRoom() {
@@ -60,16 +58,20 @@ export function AdminRoom() {
                     <img src={logoImg} alt="logo"/>
                     <div>
                         <RoomCode code={roomId} />
-                        <Button isOutlined onClick={handleEndRoom}>Encerrar Sala</Button>
+                        <Button className="responsive" isOutlined onClick={handleEndRoom}>Encerrar Sala</Button>
                     </div>
                 </div>
             </header>
             <main className="content">
                 <div className="room-title">
                     <h1>Sala {title}</h1>
+                    <div>
                     {
-                        questions&& <span>{questions.length} perguntas</span>
+                        questions && <span>{questions.length} perguntas</span>
                     }
+                        <Button isOutlined onClick={handleEndRoom}>Encerrar Sala</Button>
+                    </div>
+
                 </div>
                 
                 <div className="question-list">

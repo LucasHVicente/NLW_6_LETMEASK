@@ -6,7 +6,6 @@ import { Button } from '../components/Button';
 import { Question } from "../components/Question";
 
 import { RoomCode } from '../components/RoomCode';
-import { useAuth } from "../hooks/useAuth";
 import { useRoom } from "../hooks/useRoom";
 import { database } from "../services/firebase";
 import  deleteImg  from '../assets/images/delete.svg';
@@ -14,6 +13,7 @@ import  checkImg  from '../assets/images/check.svg';
 import  answerImg  from '../assets/images/answer.svg';
 
 import '../styles/room.scss'
+import { ConfirmModal } from "../components/ConfirmModal";
 
 type RoomParams = {
     id: string
@@ -23,7 +23,9 @@ export function AdminRoom() {
     const history = useHistory()
     const params = useParams<RoomParams>();
     const roomId = params.id;
+    const [deletingQuestionId, setDeletingQuestionId] = useState('')
     const {questions, title} = useRoom(roomId)
+    const [endRoomModalIsOpen, setEndRoomModalIsOpen] = useState(false)
     
     
     async function handleEndRoom() {
@@ -34,11 +36,12 @@ export function AdminRoom() {
     }
 
 // TODO Modal de confirmação
-    async function handleDeleteQuestion(questionId:string) {
-        if(window.confirm('Tem certeza que você deseja excluir esta pergunta?')){
-            await database.ref(`rooms/${roomId}/questions/${questionId}`).remove();
-        }
+    async function handleDeleteQuestion() {
+        await database.ref(`rooms/${roomId}/questions/${deletingQuestionId}`).remove()
+        setDeletingQuestionId('')
+        setEndRoomModalIsOpen(false);
     }
+    
 
     async function handleCheckQuestionAsAnswered(questionId:string) {
         await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
@@ -58,7 +61,7 @@ export function AdminRoom() {
                     <img src={logoImg} alt="logo"/>
                     <div>
                         <RoomCode code={roomId} />
-                        <Button className="responsive" isOutlined onClick={handleEndRoom}>Encerrar Sala</Button>
+                        <Button cssClass="end-room" isOutlined onClick={()=>setEndRoomModalIsOpen(true)}>Encerrar Sala</Button>
                     </div>
                 </div>
             </header>
@@ -69,7 +72,7 @@ export function AdminRoom() {
                     {
                         questions && <span>{questions.length} perguntas</span>
                     }
-                        <Button isOutlined onClick={handleEndRoom}>Encerrar Sala</Button>
+                        <Button isOutlined onClick={()=>setEndRoomModalIsOpen(true)}>Encerrar Sala</Button>
                     </div>
 
                 </div>
@@ -105,7 +108,10 @@ export function AdminRoom() {
                             }
                             <button
                                 type="button"
-                                onClick={()=>handleDeleteQuestion(question.id)}
+                                onClick={()=>{
+                                    
+                                    setDeletingQuestionId(question.id);
+                                }}
                             >
                                 <img src={deleteImg} alt="remover pergunta"/>
                             </button>
@@ -114,6 +120,22 @@ export function AdminRoom() {
                 }
                 </div>
             </main>
+
+            <ConfirmModal
+                modalIsOpen={endRoomModalIsOpen}
+                closeModal={()=>setEndRoomModalIsOpen(false)}
+            >
+                <div className="end-room-modal">
+                    <div>
+                        <h1>Encerrar sala</h1>
+                        <p>Tem certeza que você deseja encerrar esta sala?</p>
+                    </div>
+                    <div>
+                        <button onClick={()=>setEndRoomModalIsOpen(false)}>Cancelar</button>
+                        <button onClick={handleEndRoom} >Sim, encerrar</button>
+                    </div>
+                </div>
+            </ConfirmModal>
         </div>
     )
 }

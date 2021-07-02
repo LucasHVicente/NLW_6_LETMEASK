@@ -36,11 +36,11 @@ export function AdminRoom() {
     }
 
 // TODO Modal de confirmação
-    async function handleDeleteQuestion() {
-        await database.ref(`rooms/${roomId}/questions/${deletingQuestionId}`).remove()
-        setDeletingQuestionId('')
-        setEndRoomModalIsOpen(false);
-    }
+    // async function handleDeleteQuestion() {
+    //     await database.ref(`rooms/${roomId}/questions/${deletingQuestionId}`).remove()
+    //     setDeletingQuestionId('')
+    //     setEndRoomModalIsOpen(false);
+    // }
     
 
     async function handleCheckQuestionAsAnswered(questionId:string) {
